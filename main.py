@@ -44,9 +44,8 @@ class DocApiRequest(webapp2.RequestHandler):
  
 class BookLibraryRequest(webapp2.RequestHandler):
    def get(self):
-   		messages = database.getLibrary()
-        self.response.write(utils.dataTojson(data).encode('utf-8'))
-        self.response.write();
+   		books = database.getLibrary(self.request.host_url)
+        
 
 class BookRequest(webapp2.RequestHandler):
     def get(self):

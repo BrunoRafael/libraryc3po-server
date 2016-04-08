@@ -14,7 +14,7 @@ def generateDatabase():
 	database.saveMessage('786500')
 	database.saveMessage('786520')
 
-def dataToJson():
+def dataToJson(data):
 	return json.dumps(
         data,
         default=date_handler,
