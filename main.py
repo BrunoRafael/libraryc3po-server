@@ -1,3 +1,4 @@
+# coding: utf-8
 #!/usr/bin/env python
 #
 # Copyright 2007 Google Inc.
@@ -16,10 +17,14 @@
 #
 
 import os
+import datetime
+import json
 
-from google.appengine.ext import ndb
 import webapp2
 import jinja2
+
+import database
+import utils
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -29,15 +34,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 
 
-class MainRequest(webapp2.RequestHandler):
-	def get(self):
-		values = {
-			'title': 'Documentation'
-		}
-		template = JINJA_ENVIRONMENT.get_template('doc.html')
-		self.response.write(template.render(values));
-		#teste.test();
-
 class DocApiRequest(webapp2.RequestHandler):
     def get(self):
 		values = {
@@ -45,10 +41,11 @@ class DocApiRequest(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIRONMENT.get_template('doc.html')
 		self.response.write(template.render(values));
-		#teste.test();
  
 class BookLibraryRequest(webapp2.RequestHandler):
    def get(self):
+   		messages = database.getLibrary()
+        self.response.write(utils.dataTojson(data).encode('utf-8'))
         self.response.write();
 
 class BookRequest(webapp2.RequestHandler):
@@ -87,7 +84,7 @@ class CleanDatabaseRequest(webapp2.RequestHandler):
 		pass
 
 app = webapp2.WSGIApplication([
-    ('/', MainRequest),
+    ('/', DocApiRequest),
     ('/books', BookLibraryRequest),
     ('/books/.*', BookRequest),
     ('/books/addBook', BookAddRequest),
@@ -95,7 +92,8 @@ app = webapp2.WSGIApplication([
     ('/books/removeBook', BookRemoveRequest),
     ('/books/searchBooks', BookSearchRequest),
     ('/books/addComment', BookAddCommentRequest),
-	('/books/help/api', DocApiRequest),
 	('/books/delete/database', DeleteDatabaseRequest),
 	('/books/clean/database', CleanDatabaseRequest)
 ], debug=True)
+
+utils.generateDatabase();
