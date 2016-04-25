@@ -29,7 +29,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     variable_start_string='[[',
-	variable_end_string=']]',
+    variable_end_string=']]',
     autoescape=True)
 
 
@@ -48,22 +48,21 @@ class BookLibraryRequest(webapp2.RequestHandler):
    		books = database.getLibrary()
    		for b in books:
    			bookDict = b.to_dict(URLBASE)
-   			bookDictEncoded = Utils.dataToJson(bookDict).encode('utf-8')
-   			response.append(bookDictEncoded)
+   			response.append(bookDict)
    		
-   		self.response.write(response)
+   		self.response.write(utils.dataToJsonString(response))
 
 class BookRequest(webapp2.RequestHandler):
     def get(self, bookId):
-    	book = database.getBook(bookId);
-        if book is None:
-            self.response.set_status(400)
-            self.response.write('{"msg":"Livro \'%s\' não encontrado", "error":404, "datetime":"%s"}' % (bookid, datetime.datetime.now().isoformat()))
-            return
+      book = database.getBook(bookId);
+      if book is None:
+        self.response.set_status(400)
+        self.response.write('{"msg":"Livro \'%s\' não encontrado", "error":404, "datetime":"%s"}' % (bookid, datetime.datetime.now().isoformat()))
+        return
 
-        URLBASE = self.request.host_url
-        bookDict = book.to_dict(URLBASE);
-        self.response.write(utils.dataToJson(bookDict).encode('utf-8'))
+      URLBASE = self.request.host_url
+      bookDict = book.to_dict(URLBASE);
+      self.response.write(utils.dataToJsonString(bookDict).encode('utf-8'))
 
 class BookRemoveRequest(webapp2.RequestHandler):
     def delete(self):
@@ -96,9 +95,9 @@ class BookAddCommentRequest(webapp2.RequestHandler):
 		pass
 
 class DeleteDatabaseRequest(webapp2.RequestHandler):
-	def post(self):
-		print("Aqui9")
-		pass
+  def delete(self):
+    database.removeAll('Bo');
+    self.response.write("Livros removidos com sucesso!")
 
 class BookLogListRequest(webapp2.RequestHandler):
 	def get(self):
@@ -119,7 +118,7 @@ app = webapp2.WSGIApplication([
     ('/books/removeBook', BookRemoveRequest),
     ('/books/searchBooks', BookSearchRequest),
     ('/books/addComment', BookAddCommentRequest),
-	('/books/delete/database', DeleteDatabaseRequest),
-	('/books/clean/database', CleanDatabaseRequest),
-	('/books/(.*)', BookRequest),
+  	('/books/delete/database', DeleteDatabaseRequest),
+  	('/books/clean/database', CleanDatabaseRequest),
+  	('/books/(.*)', BookRequest),
 ], debug=True)

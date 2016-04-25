@@ -14,9 +14,10 @@ class Book(ndb.Model):
 	bookId= ndb.StringProperty()
 	title = ndb.StringProperty(default="sem titulo")
 	authors = ndb.StringProperty(repeated=True)
-	description = ndb.StringProperty()
+	sinopse = ndb.StringProperty()
 	imgUrl = ndb.StringProperty()
-	create_datetime = ndb.DateTimeProperty(auto_now_add=True)
+	price = ndb.FloatProperty()
+	dateCreated = ndb.DateTimeProperty(auto_now_add=True)
 	comments = ndb.StructuredProperty(Comment, repeated=True)
 
 	def to_dict(self, URLBASE=""):
@@ -24,14 +25,15 @@ class Book(ndb.Model):
 		data["url"] = "%s/books/%s" % (URLBASE, self.bookId)
 		return data
 
-def saveBook(bookId, title, authors, description, imgUrl):
+def saveBook(bookId, title, authors, price, sinopse, imgUrl):
 	book = Book(id=bookId)
 	book.title = title
 	book.authors = authors
-	book.description = description
+	book.price = price
+	book.sinopse = sinopse
 	book.bookId= bookId
 	book.imgUrl = imgUrl
-	book.create_datetime = datetime.datetime.now()
+	book.dateCreated = datetime.datetime.now()
 	logging.debug(book)
 	book.put();
 
@@ -58,4 +60,3 @@ def listAllBooks():
 	result = Book.query();
 	for book in result:
 		logging.info(book)
-   	
