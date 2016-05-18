@@ -8,6 +8,9 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+  http_headers:
+    Access-Control-Allow-Origin: '*'
+    Access-Control-Allow-Methods: "OPTIONS,GET,POST,PUT,DELETE"
 
 - url: .*
   script: main.app

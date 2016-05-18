@@ -65,9 +65,8 @@ class BookRequest(webapp2.RequestHandler):
       self.response.write(utils.dataToJsonString(bookDict).encode('utf-8'))
 
 class BookRemoveRequest(webapp2.RequestHandler):
-    def delete(self):
-    	print("Aqui3")
-    	pass
+    def delete(self, bookId):
+    	self.response.write("Removed! " + bookId);
 
 class BookUpdateRequest(webapp2.RequestHandler):
     def put(self):
@@ -112,12 +111,12 @@ class CleanDatabaseRequest(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', DocApiRequest),
     ('/books', BookLibraryRequest),
-    ('/books/addBook', BookAddRequest),
-    ('/books/listAllBooks', BookLogListRequest),
-    ('/books/updateBook', BookUpdateRequest),
-    ('/books/removeBook', BookRemoveRequest),
-    ('/books/searchBooks', BookSearchRequest),
-    ('/books/addComment', BookAddCommentRequest),
+    ('/books/add/book', BookAddRequest),
+    ('/books/list/book', BookLogListRequest),
+    ('/books/update/book', BookUpdateRequest),
+    ('/books/remove/book?bookid=(\d+)', BookRemoveRequest),
+    ('/books/search/book', BookSearchRequest),
+    ('/books/add/comment', BookAddCommentRequest),
   	('/books/delete/database', DeleteDatabaseRequest),
   	('/books/clean/database', CleanDatabaseRequest),
   	('/books/(.*)', BookRequest),
