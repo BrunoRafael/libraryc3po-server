@@ -35,25 +35,28 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class DocApiRequest(webapp2.RequestHandler):
     def get(self):
-    	print("Aqui0")
-    	values = {'title': 'Documentation'}
-    	template = JINJA_ENVIRONMENT.get_template('doc.html')
-    	self.response.write(template.render(values))
+      self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+      self.response.headers['Content-Type'] = 'application/json'
+      values = {'title': 'Documentation'}
+      template = JINJA_ENVIRONMENT.get_template('doc.html')
+      self.response.write(template.render(values))
  
 class BookLibraryRequest(webapp2.RequestHandler):
    def get(self):
-   		
-   		response = []
-   		URLBASE = self.request.host_url
-   		books = database.getLibrary()
-   		for b in books:
-   			bookDict = b.to_dict(URLBASE)
-   			response.append(bookDict)
-   		
-   		self.response.write(utils.dataToJsonString(response))
+    self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+    self.response.headers['Content-Type'] = 'application/json'
+    response = []
+    URLBASE = self.request.host_url
+    books = database.getLibrary()
+    for b in books:
+      bookDict = b.to_dict(URLBASE)
+      response.append(bookDict)
+    self.response.write(utils.dataToJsonString(response))
 
 class BookRequest(webapp2.RequestHandler):
     def get(self, bookId):
+      self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+      self.response.headers['Content-Type'] = 'application/json'
       book = database.getBook(bookId);
       if book is None:
         self.response.set_status(400)
@@ -65,8 +68,16 @@ class BookRequest(webapp2.RequestHandler):
       self.response.write(utils.dataToJsonString(bookDict).encode('utf-8'))
 
 class BookRemoveRequest(webapp2.RequestHandler):
-    def delete(self, bookId):
-    	self.response.write("Removed! " + bookId);
+  def options(self, bookId):
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
+    self.response.headers['Access-Control-Allow-Headers'] = '*'
+    self.response.headers['Content-Type'] = 'application/json'
+    self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE, OPTIONS'
+    self.response.write("options do removeBook funcionou!");
+  
+  def delete(self, bookId):
+    database.remove(bookId);
+    self.response.write(bookId);
 
 class BookUpdateRequest(webapp2.RequestHandler):
     def put(self):
@@ -75,38 +86,56 @@ class BookUpdateRequest(webapp2.RequestHandler):
 
 class BookAddRequest(webapp2.RequestHandler):
     def post(self):
-    	print("Aqui5")
-    	pass
+      self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+      self.response.headers['Content-Type'] = 'application/json'
+      print("Aqui5")
+      pass
 
 class BookSearchRequest(webapp2.RequestHandler):
-	def get(self):
-		print("Aqui6")
-		pass
+  def get(self):
+    self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+    self.response.headers['Content-Type'] = 'application/json'
+    print("Aqui6")
+    pass
 
 class BookAddCommentRequest(webapp2.RequestHandler):
-	def post(self):
-		print("Aqui7")
-		pass
+  def post(self):
+    self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+    self.response.headers['Content-Type'] = 'application/json'
+    print("Aqui7")
+    pass
 
 class BookAddCommentRequest(webapp2.RequestHandler):
-	def post(self):
-		print("Aqui8")
-		pass
+  def post(self):
+    self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+    self.response.headers['Content-Type'] = 'application/json'
+    print("Aqui8")
+    pass
 
 class DeleteDatabaseRequest(webapp2.RequestHandler):
+  def options(self):
+    self.response.headers['Access-Control-Allow-Origin'] = '*'
+    self.response.headers['Access-Control-Allow-Headers'] = '*'
+    self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE, OPTIONS'
+    self.response.write("options funcionou!");
+
   def delete(self):
     database.removeAll('Bo');
-    self.response.write("Livros removidos com sucesso!")
+    self.response.write("Livros removidos com sucesso!");
 
 class BookLogListRequest(webapp2.RequestHandler):
-	def get(self):
-		database.listAllBooks()
+  def get(self):
+    self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+    self.response.headers['Content-Type'] = 'application/json'
+    database.listAllBooks()
 
 class CleanDatabaseRequest(webapp2.RequestHandler):
-	def get(self):
-		print("clean")
-		utils.generateDatabase();
-		self.response.write("Tudo salvo!");
+  def get(self):
+    self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+    self.response.headers['Content-Type'] = 'application/json'
+    print("clean")
+    utils.generateDatabase();
+    self.response.write("Tudo salvo!");
 
 app = webapp2.WSGIApplication([
     ('/', DocApiRequest),
@@ -114,7 +143,7 @@ app = webapp2.WSGIApplication([
     ('/books/add/book', BookAddRequest),
     ('/books/list/book', BookLogListRequest),
     ('/books/update/book', BookUpdateRequest),
-    ('/books/remove/book?bookid=(\d+)', BookRemoveRequest),
+    ('/books/remove/(.*)', BookRemoveRequest),
     ('/books/search/book', BookSearchRequest),
     ('/books/add/comment', BookAddCommentRequest),
   	('/books/delete/database', DeleteDatabaseRequest),

@@ -56,6 +56,11 @@ def removeAll(type):
 		ndb.delete_multi(
 	    	Book.query().fetch(keys_only=True)
 		)
+
+def remove(bookId):
+	logging.info(bookId);
+	#ndb.Key(Book, bookId).delete();
+
 def listAllBooks():
 	result = Book.query();
 	for book in result:
